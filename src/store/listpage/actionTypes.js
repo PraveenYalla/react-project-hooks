@@ -1,0 +1,9 @@
+/* LIST PAGE */
+export const LIST_API_SUBMIT = "LIST_API_SUBMIT"
+export const LIST_API_SUBMIT_SUCCESS = "LIST_API_SUBMIT_SUCCESS"
+export const KEYS_ARRAY_LIST = "KEYS_ARRAY_LIST"
+export const KEYS_ARRAY = "KEYS_ARRAY"
+export const SELECTED_KEYS = "SELECTED_KEYS"
+export const UPDATED_RESULTS = "UPDATED_RESULTS"
+export const LIST_DATA = "LIST_DATA"
+export const RESET = "RESET"
