@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
-import { addAPI, getKeysArrayList, getKeysArray, setSelectedKeys, setUpdatedResults, resetStore } from '../../store/listpage/actions'
+import { addAPI, getKeysArrayList, getKeysArray, setSelectedKeys, setUpdatedResults, resetStore, startLoading, stopLoading } from '../../store/listpage/actions'
 
-import { Card, CardBody, Row, CardTitle, Form, Container, Label, Input, FormGroup, Button } from "reactstrap"
+import { Card, CardBody, Row, CardTitle, Form, Container, Label, Input, FormGroup, Button, Spinner } from "reactstrap"
 
 import SimpleBar from "simplebar-react"
 import ListItem from './ListItem';
@@ -57,7 +57,10 @@ function _keysArraryList(arr) {
         let arrList = []
         for (var props in arr) {
             if (Array.isArray(arr[props])) {
-                arrList.push(props);
+                arrList.push({
+                    name: props,
+                    selected: false
+                });
             }
         }
         return arrList;
@@ -90,10 +93,14 @@ const ListPage = () => {
     const ObjKeysArray = useSelector(state => state.ListPage.keysArray);
     const selectedObjKeys = useSelector(state => state.ListPage.selectedKeys);
     const updatedResultsList = useSelector(state => state.ListPage.updatedResults);
+    const loadingState = useSelector(state => state.ListPage.loading);
+
     const [ListData, setListData] = useState([])
+    const [togglePanel, settogglePanel] = useState(false)
 
 
     const inputQuery = useRef(null)
+    console.log("Called")
 
     useEffect(() => {
         console.log("Called")
@@ -117,44 +124,141 @@ const ListPage = () => {
     }, [_ListData])
 
 
-    const onQueryChange = () => {
-        let newQuery = inputQuery.current.value;
-        if (newQuery !== "") {
-            dispatch(resetStore());
-            dispatch(addAPI(newQuery));
-        }
-    }
+    // useEffect(() => {
 
-    const dispatchKeysArrayList = (item) => {
-        let arrlist = _ListData[item];
-        let getObjList = _getUpdatedData(arrlist);
-        setListData(getObjList);
-        const res = _keysFromObj(getObjList[0]);
-        dispatch(getKeysArray(res))
-    }
+    //     return () => {
+    //         // cleanup
+    //     }
+    // }, [ObjKeysArray])
 
-
-
-
-    const setSelectedObjKeys = (selectedKeys) => {
-        dispatch(setSelectedKeys(selectedKeys))
-    }
-
-    const setUpdatedFinalResults = (selectedobjList) => {
-            const selectedList = selectedobjList || selectedObjKeys
-        const UpdateListResult = ListData.reduce((acc, cur) => {
-            let obj = {}
-            for (let i = 0; i < selectedList.length; i++) {
-                obj[selectedList[i]['name']] = cur[selectedList[i]['name']]
+    const onQueryChange = useCallback(
+        () => {
+            let newQuery = inputQuery.current.value;
+            if (newQuery !== "") {
+                dispatch(resetStore());
+                dispatch(addAPI(newQuery));
+                settogglePanel(true);
             }
-            
-            acc.push(obj)
-            return acc
+        }
+    )
 
-        }, [])
-        console.log(UpdateListResult);
-        dispatch(setUpdatedResults(UpdateListResult))
-    }
+    // const onQueryChange = () => {
+    //     let newQuery = inputQuery.current.value;
+    //     if (newQuery !== "") {
+    //         dispatch(resetStore());
+    //         dispatch(addAPI(newQuery));
+    //         settogglePanel(true)
+    //     }
+    // }
+
+    const dispatchKeysArrayList = useCallback(
+        (item) => {
+
+            dispatch(setSelectedKeys([]))
+            console.log(item);
+            let arrlist = _ListData[item.name];
+            let getObjList = _getUpdatedData(arrlist);
+            setListData(getObjList);
+            const res = _keysFromObj(getObjList[0]);
+            let result = (JSON.stringify(ObjKeysArray) !== JSON.stringify(res)) ? res : ""
+            console.log(result);
+            dispatch(getKeysArray(result))
+        }
+    )
+
+    // const dispatchKeysArrayList = (item) => {
+    //     dispatch(setSelectedKeys([]))
+    //     console.log(item);
+    //     let arrlist = _ListData[item.name];
+    //     let getObjList = _getUpdatedData(arrlist);
+    //     setListData(getObjList);
+    //     const res = _keysFromObj(getObjList[0]);
+    //     let result = (JSON.stringify(ObjKeysArray) !== JSON.stringify(res)) ? res : ""
+    //     console.log(result);
+    //     dispatch(getKeysArray(result))
+    // }
+
+    // useEffect(() => {
+    //     dispatch(setUpdatedResults([]))
+    //     // dispatch(getKeysArray([result]))
+    //     return () => {
+    //     }
+    // }, [ObjKeysArray])
+
+
+    const setSelectedObjKeys = useCallback(
+        (selectedKeys) => {
+            dispatch(setSelectedKeys(selectedKeys))
+        }
+    )
+
+    // const setSelectedObjKeys = (selectedKeys) => {
+    //     dispatch(setSelectedKeys(selectedKeys))
+    // }
+
+    const setUpdatedFinalResults = useCallback(
+         (selectedobjList) => {
+            dispatch(setSelectedKeys(selectedobjList))
+            const selectedList = (selectedobjList.length > 0) ? selectedobjList : selectedObjKeys;
+
+
+            if (selectedList.length > 0) {
+                const UpdateListResult =  ListData.reduce((acc, cur) => {
+                    let obj = {}
+                    for (let i = 0; i < selectedList.length; i++) {
+                        obj[selectedList[i]['name']] = cur[selectedList[i]['name']]
+                    }
+
+                    acc.push(obj)
+                    return acc
+
+                }, [])
+                if (UpdateListResult.length > 0) {
+                     dispatch(setUpdatedResults(UpdateListResult))
+                }
+            }
+
+
+        }
+    )
+
+    // const setUpdatedFinalResults = (selectedobjList) => {
+    //     dispatch(setSelectedKeys(selectedobjList))
+    //     const selectedList = (selectedobjList.length > 0) ? selectedobjList : selectedObjKeys;
+    //     console.log(selectedList);
+    //     console.log(selectedObjKeys);
+    //     if (selectedList.length > 0) {
+    //         const UpdateListResult = ListData.reduce((acc, cur) => {
+    //             let obj = {}
+    //             for (let i = 0; i < selectedList.length; i++) {
+    //                 obj[selectedList[i]['name']] = cur[selectedList[i]['name']]
+    //             }
+
+    //             acc.push(obj)
+    //             return acc
+
+    //         }, [])
+    //         if (UpdateListResult.length > 0) {
+    //             dispatch(setUpdatedResults(UpdateListResult))
+    //         }
+    //     }
+    // }
+
+
+    // const makeTogglePanel = useMemo(() => {
+    //     settogglePanel(!togglePanel)
+    // },[])
+
+    const makeTogglePanel = useCallback(
+        () => {
+            settogglePanel(!togglePanel)
+        },
+        [togglePanel]
+    )
+
+    // const makeTogglePanel = () => {
+    //     settogglePanel(!togglePanel)
+    // }
 
 
     return (
@@ -163,25 +267,35 @@ const ListPage = () => {
                 <CardBody>
                     <CardTitle className="mb-4">Create List</CardTitle>
                     <Row className="mb-3">
-                        <div className="col-md-10">
-                            <input
-                                className="form-control"
-                                type="text"
-                                ref={inputQuery}
-                                placeholder="Ex: https://xyz.com/users"
-                            />
+                        <div className="col-md-12 col-sm-12 col-xs-12">
+                            <div className="input-group">
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    ref={inputQuery}
+                                    placeholder="Ex: https://xyz.com/users"
+                                />
+                                <button className="btn btn-primary waves-effect waves-light btn btn-primary" onClick={onQueryChange}>Submit</button>
+                                <button onClick={makeTogglePanel} className="btn btn-danger waves-effect waves-light btn btn-primary">
+                                    <i className="mdi mdi-arrow-down-drop-circle-outline me-2"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div className="col-md-2">
-                            <button className="btn btn-primary waves-effect waves-light btn btn-primary" onClick={onQueryChange}>Submit</button>
-                        </div>
                     </Row>
+                    {loadingState && <div className="justify-content-center row"><Spinner className="m-1 " color="primary" /> </div>}
+                    <div className={togglePanel ? 'showpanel' : 'hidepanel'}>
+                        <Row>
+                            {KeysArrayLists.length > 0 && <ListKeysArray KeysList={KeysArrayLists} dispatchKeysArrayList={dispatchKeysArrayList} />}
+                        </Row>
+                        <Row>
+                            {ObjKeysArray.length > 0 && <ListKeys objKeysList={ObjKeysArray} setUpdatedFinalResults={setUpdatedFinalResults} selectedObjKeys={selectedObjKeys} setSelectedObjKeys={setSelectedObjKeys} />}
+                        </Row>
+                    </div>
+
                     <Row>
-                        {KeysArrayLists.length > 0 && <ListKeysArray KeysList={KeysArrayLists} dispatchKeysArrayList={dispatchKeysArrayList} />}
+                        {(updatedResultsList.length > 0) && <ListItem item={updatedResultsList} selectedObjKeys={selectedObjKeys} />}
                     </Row>
-                    <Row>
-                        {ObjKeysArray.length > 0 && <ListKeys objKeysList={ObjKeysArray} setUpdatedFinalResults={setUpdatedFinalResults} selectedObjKeys={ selectedObjKeys } setSelectedObjKeys={setSelectedObjKeys} />}
-                    </Row>
-                    <SimpleBar style={{ maxHeight: "336px" }}>
+                    {/* <SimpleBar style={{ maxHeight: "336px" }}>
                         {
                             (updatedResultsList.length > 0) ?
                                 updatedResultsList.map((item, i) =>
@@ -189,7 +303,7 @@ const ListPage = () => {
                                 )
                                 : ""
                         }
-                    </SimpleBar>
+                    </SimpleBar> */}
                 </CardBody>
             </Card>
         </React.Fragment>

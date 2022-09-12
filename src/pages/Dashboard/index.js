@@ -4,6 +4,8 @@ import { useDispatch } from 'react-redux';
 import { changeLayout } from '../../store/layout/actions'
 import EmployeeList from "../EmployeeLists/EmployeeList";
 import ListPage from "../ListPage/ListPage";
+import QrCode from "../qrcode/qrcode";
+import Weather from "../Weather/Weather";
 
 
 const Dashboard = () => {
@@ -25,10 +27,17 @@ const Dashboard = () => {
             </h3>
 
             <Row>
-              <Col xl={6}>
+              <Col xl={3}>
+                <QrCode/>
+              </Col>
+              
+              <Col xl={5}>
+                  <Weather />
+              </Col>
+              <Col xl={4}>
                 <EmployeeList />
               </Col>
-              <Col xl={6}>
+              <Col xl={12}>
                 <ListPage />
               </Col>
             </Row>

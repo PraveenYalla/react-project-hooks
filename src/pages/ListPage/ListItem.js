@@ -1,35 +1,51 @@
 import React from 'react';
-import { Row, Col } from 'reactstrap';
+import { Row, Col, Table } from 'reactstrap';
+import SimpleBar from "simplebar-react"
 
-const ListItem = ({ selectedObjKeys, item }) => {
-    // const item = props.item;
+const ListItem = React.memo(({ selectedObjKeys, item }) => {
+    console.log(selectedObjKeys)
+    console.log(item)
     return (
         <div>
-            <Row className="emp-item align-items-center g-0 mt-3">
-                {
-                    (selectedObjKeys.length > 0) ? (
-                        selectedObjKeys.map((res, i) => (
-                            <Col sm={4} key={i}>
-                                <p className="text-truncate mt-1 mb-0"><i className="mdi mdi-circle-medium text-warning me-2"></i> {item[res.name]} </p>
-                            </Col>
-                        ))
+            <div className="list-table">
 
-                    ) : (<p>no results</p>)
-                }
+              <Table className="table-centered table-nowrap mb-0" >
 
-                {/* <Col sm={4}>
-                    <p className="text-truncate mt-1 mb-0"><i className="mdi mdi-circle-medium text-warning me-2"></i> {item.name} </p>
-                </Col>
-                <Col sm={4}>
-                    <p className="text-truncate mt-1 mb-0"><i className="mdi mdi-cellphone-iphone text-warning me-2"></i>{item.phone}</p>  
-                </Col>
-                <Col sm={4}>
-                    <p className="text-truncate mt-1 mb-0"><i className="mdi mdi-web text-warning me-2"></i>{item.website}</p>  
-                </Col> */}
+                <thead className="table-light">
+                    <tr>
+                        {
+                            (selectedObjKeys.length > 0) ? (
+                                selectedObjKeys.map((res, i) => (
+                                    <th>{res.name}</th>
+                                ))
+                            ) : ""
+                        }
+                    </tr>
 
-            </Row>
+                </thead>
+
+                <tbody>
+                        {
+                            (item.length > 0) ? (
+                                item.map((res, i) => (
+                                    <tr>
+                                        {selectedObjKeys.map((res1, j) => (
+
+                                            <td>
+                                                {res[res1.name]}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+
+                            ) : ""
+                        }
+                </tbody>
+            </Table>
+
+            </div>
         </div>
     )
-}
+})
 
 export default ListItem;

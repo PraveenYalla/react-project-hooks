@@ -26,6 +26,8 @@ import contacts from "./contacts/reducer"
 
 import ListPage from "./listpage/reducer"
 
+import Weather from './weather/weather.reducer'
+
 const rootReducer = combineReducers({
   // public
   Layout,
@@ -38,7 +40,8 @@ const rootReducer = combineReducers({
   ecommerce,
   invoices,
   contacts,
-  ListPage
+  ListPage,
+  Weather
 })
 
 export default rootReducer

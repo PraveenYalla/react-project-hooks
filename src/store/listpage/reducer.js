@@ -6,15 +6,18 @@ import {
   KEYS_ARRAY,
   SELECTED_KEYS,
   UPDATED_RESULTS,
+  START_LOADING,
+  STOP_LOADING,
   RESET
 } from "./actionTypes"
 
 const INIT_STATE = {
+  loading: false,
   listData: [],
-  keysArrayList:[],
-  keysArray:[],
-  selectedKeys:[],
-  updatedResults:[],
+  keysArrayList: [],
+  keysArray: [],
+  selectedKeys: [],
+  updatedResults: [],
   query: ""
 }
 
@@ -23,11 +26,13 @@ const ListPage = (state = INIT_STATE, action) => {
     case LIST_API_SUBMIT:
       return {
         ...state,
+        loading:true,
         query: action.query,
       }
     case LIST_API_SUBMIT_SUCCESS:
       return {
         ...state,
+        loading:false,
         listData: action.payload
       }
     case KEYS_ARRAY_LIST:
@@ -50,9 +55,19 @@ const ListPage = (state = INIT_STATE, action) => {
         ...state,
         updatedResults: action.payload
       }
+    case START_LOADING:
+      return {
+        ...state,
+        loading: true
+      }
+    case STOP_LOADING:
+      return {
+        ...state,
+        loading: false
+      }
     case RESET:
       return INIT_STATE
-    
+
     default:
       return state
   }

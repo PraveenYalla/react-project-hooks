@@ -5,6 +5,8 @@ import {
   KEYS_ARRAY,
   SELECTED_KEYS,
   UPDATED_RESULTS,
+  START_LOADING,
+  STOP_LOADING,
   RESET
 } from "./actionTypes"
 
@@ -36,6 +38,15 @@ export const setUpdatedResults = data => ({
   type: UPDATED_RESULTS,
   payload: data,
 })
+
+export const startLoading = () => ({
+  type: START_LOADING
+})
+
+export const stopLoading = () => ({
+  type: STOP_LOADING
+})
+
 export const resetStore = () => ({
   type: RESET
 })

@@ -1,9 +1,33 @@
-.h200{
+.h200 {
     height: 200px;
     overflow: auto;
 }
 
-.emp-item{
+.emp-item {
     border-bottom: thin solid #eee;
     padding-bottom: 15px;
+}
+
+.showpanel {
+    display: block;
+}
+
+.hidepanel {
+    display: none;
+}
+
+.card-body {
+    min-height: 450px;
+}
+
+.list-table {
+    overflow: auto;
+    max-height: 250px;
+    margin-top: 10px;
+    table {
+        thead {
+            position: sticky;
+            top: -1px;
+        }
+    }
 }

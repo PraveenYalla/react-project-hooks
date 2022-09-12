@@ -1,13 +1,22 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Input, Label, Button } from 'reactstrap';
 import { useSelector } from 'react-redux';
 
-const ListKeys = props => {
+const ListKeys = React.memo((props) => {
     const { objKeysList, setSelectedObjKeys, selectedObjKeys, setUpdatedFinalResults } = props;
-    const [arrKeys, setArrKeys] = useState(objKeysList)
+    const [arrKeys, setArrKeys] = useState([])
     const [selectedList, setSelectedList] = useState([])
-
+    console.log(objKeysList);
     let updateobjKeysList = []
+
+    useEffect(() => {
+        if(objKeysList){
+            setArrKeys(prev => prev !== objKeysList ? objKeysList : prev);
+            // setSelectedList([])
+        }
+    }, [])
+
+
 
     // function getList(list) {
     //     if (list !== undefined) {
@@ -28,10 +37,7 @@ const ListKeys = props => {
     // getList(selectedObjKeys);
 
     const onChecked = (e, cur) => {
-
-
-
-
+        console.log("checked")
         arrKeys.map(res => {
             if (res.name === cur.name) {
                 res.checked = !res.checked;
@@ -40,7 +46,7 @@ const ListKeys = props => {
 
 
         console.log(selectedList.indexOf(cur) === -1);
-        if(selectedList){
+        if (selectedList) {
             if (selectedList.indexOf(cur) !== -1) {
                 selectedList.splice(selectedList.indexOf(cur), 1)
             } else {
@@ -51,27 +57,19 @@ const ListKeys = props => {
 
         setArrKeys([...arrKeys]);
         setSelectedList(selectedList);
-        // setSelectedList(getList);
-
-        // let checkedVal = e.target.value;
-        // if (e.target.checked && (selectedList.indexOf(res) == -1)) {
-        //     selectedList.push(res);
-        // } else {
-        //     e.target.checked = false;    
-        //     selectedList.splice(selectedList.indexOf(res), 1);
-        // }
-        // console.log(selectedList);
-        // getList(selectedList)
-        // setSelectedObjKeys(selectedList)
-        // setSelectedObjKeys(selectedList);
-        // setSelectedObjKeys(selectedObjKeys);
+      
     }
 
-    const submitSelectedList = () => {
-
+    const submitSelectedList = useCallback(
+        () => {
         setUpdatedFinalResults(selectedList);
-        setSelectedObjKeys(selectedList);
-    }
+        }
+    )
+    // const submitSelectedList = () => {
+
+    //     setUpdatedFinalResults(selectedList);
+    //     // setSelectedObjKeys(selectedList);
+    // }
 
     return (
         <div className="row gx-3 gy-2 align-items-center">
@@ -92,6 +90,6 @@ const ListKeys = props => {
 
         </div>
     )
-}
+})
 
 export default ListKeys;
